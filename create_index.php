@@ -3,7 +3,7 @@
 require 'vendor/autoload.php';
 
 $client = \Elasticsearch\ClientBuilder::fromConfig([
-    'hosts' => ['localhost:9200', 'localhost:9201', 'localhost:9203'],
+    'hosts' => ['localhost:9200'],
     'retries' => 2,
 ]);
 
