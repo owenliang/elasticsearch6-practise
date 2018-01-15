@@ -27,6 +27,20 @@ $resp = $client->indices()->create([
                     ],
                     'default_search' => [
                         'type' => 'ik_max_word',
+                    ],
+                    "pinyin_analyzer" => [
+                        "tokenizer" => "pinyin_tokenizer",
+                    ],
+                ],
+                "tokenizer" => [
+                    "pinyin_tokenizer" => [
+                        "type" => "pinyin",
+                        "keep_separate_first_letter" => false,
+                        "keep_full_pinyin" => true,
+                        "keep_original" => false,
+                        "limit_first_letter_length" => 16,
+                        "lowercase"  => true,
+                        "ignore_pinyin_offset" => false,
                     ]
                 ]
             ]
@@ -41,7 +55,14 @@ $resp = $client->indices()->create([
                         'type' => 'keyword',
                     ],
                     'article_title' => [
-                        'type' => 'text',
+                        'type' => 'text', // article_title中文分词
+                        'fields' => [
+                            'pinyin' => [
+                                'type' => 'text', // article_title.pinyin采用拼音分词
+                                'analyzer' => 'pinyin_analyzer',
+                                'search_analyzer' => 'pinyin_analyzer',
+                            ]
+                        ],
                     ],
                     'article_url' => [
                         'type' => 'keyword',
