@@ -7,12 +7,14 @@ $client = \Elasticsearch\ClientBuilder::fromConfig([
     'retries' => 2,
 ]);
 
-if ($client->indices()->exists(['index' => 'article'])) {
+$index_name = "article_v1";
+
+if ($client->indices()->exists(['index' => $index_name])) {
     die("index exsited");
 }
 
 $resp = $client->indices()->create([
-    'index' => 'article',
+    'index' =>$index_name,
     'body' => [
         'settings' => [
             "number_of_shards" => 3,
@@ -29,10 +31,13 @@ $resp = $client->indices()->create([
             ]
         ],
         'mappings' => [
-            'doc' => [
+            'doc' => [ // ES6.0以后的版本取消了type, 所以固定一个type名字即可
                 'properties' => [
                     'article_id' => [
                         'type' => 'long',
+                    ],
+                    'article_channel' => [
+                        'type' => 'keyword',
                     ],
                     'article_title' => [
                         'type' => 'text',
@@ -100,5 +105,5 @@ $resp = $client->indices()->create([
 
 print_r($resp);
 
-$stats = $client->indices()->getMapping(['index' => 'article']);
+$stats = $client->indices()->getMapping(['index' => $index_name]);
 print_r($stats);
