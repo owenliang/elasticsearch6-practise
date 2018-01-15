@@ -10,7 +10,8 @@ $client = \Elasticsearch\ClientBuilder::fromConfig([
 $index_name = "article_v1";
 
 if ($client->indices()->exists(['index' => $index_name])) {
-    die("index exsited");
+    print_r($client->indices()->getMapping(['index' => $index_name]));
+    return;
 }
 
 $resp = $client->indices()->create([
