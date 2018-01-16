@@ -7,6 +7,27 @@ $client = \Elasticsearch\ClientBuilder::fromConfig([
     'retries' => 2,
 ]);
 
+$resp = $client->putScript([
+    'id' => 'my_scoring',
+    'body' => [
+        'script' => [
+            'lang' => 'painless',
+            'source' => <<< EOF
+            
+            // 热度作为一个排序因素
+            def hot = doc["article_like_count"].value * doc["article_comment_count"].value;
+            if (hot == 0) {
+                hot = 1;
+            }
+            def hot_score = Math.log1p(1);
+            return hot_score;
+EOF
+        ]
+    ]
+]);
+
+print_r($resp);
+
 $resp = $client->search([
     'index' => 'article',
     'body' => [
@@ -43,8 +64,29 @@ $resp = $client->search([
                     ],
                 ],
                 'functions' => [
-
-                ]
+                    [
+                        'script_score' => [ // 脚本打分
+                            'script' => [
+                                "id" => "my_scoring",
+                                'params' => [
+                                    'cur_date' => intval(microtime(true) * 1000),
+                                ],
+                            ],
+                        ]
+                    ],
+                    [
+                        'gauss' => [ // 时间衰减, 1天内不衰减, 2天的衰减一半
+                            'article_pub_date' => [
+                                'origin' => intval(microtime(true) * 1000),
+                                'offset' => '1d',
+                                'scale' => '2d',
+                                'decay' => 0.5,
+                            ]
+                        ]
+                    ],
+                ],
+                'boost_mode' => 'multiply',
+                'score_mode' => 'multiply',
             ]
         ]
     ]
