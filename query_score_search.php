@@ -19,9 +19,9 @@ $resp = $client->search(
                         [
                             // 中文分词或者拼音分词匹配皆可, 综合打分
                             'multi_match' => [
-                                'query' => '数据线 anzhuo',
+                                'query' => '数据线',
                                 'fields' => [
-                                    'article_title', 'article_title.pinyin','article_content'
+                                    'article_title', 'article_title.pinyin', 'article_content'
                                 ],
                                 'type' => 'most_fields',
                             ]
