@@ -41,7 +41,7 @@ $resp = $client->indices()->create([
                         'keep_none_chinese_in_joined_full_pinyin' => true,
                         "limit_first_letter_length" => 16,
                         "lowercase"  => true,
-                        "ignore_pinyin_offset" => false,
+                        "ignore_pinyin_offset" => true,
                     ]
                 ]
             ]
